@@ -12,7 +12,7 @@ This application allows users to:
 - Save all data locally in the browser
 
 # Live Demo
-(Add GitHub Pages link here after deployment)
+https://capetill0.github.io/budget-buddy-final-project/
 
 # Features
     Dashboard

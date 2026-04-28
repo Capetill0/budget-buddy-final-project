@@ -6,33 +6,38 @@
   <title>Budget Buddy</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
+  <!-- NAVIGATION -->
   <nav>
     <button onclick="showSection('dashboard')">Dashboard</button>
-    <button onclick="showSection('expenses')">Expenses</button>
+    <button onclick="showSection('expenses')">Monthly Expenses</button>
     <button onclick="showSection('goals')">Savings Goals</button>
   </nav>
 
+  <!-- DASHBOARD -->
   <section id="dashboard" class="view">
-  <h1>Budget Buddy Dashboard</h1>
+    <h1>Budget Buddy Dashboard</h1>
 
-  <input id="incomeInput" type="number" placeholder="Enter Monthly Income">
-  <button id="saveIncomeBtn">Save Income</button>
+    <input id="incomeInput" type="number" placeholder="Enter Monthly Income">
+    <button id="saveIncomeBtn">Save Income</button>
 
-  <p>Total Income: $<span id="totalIncome">0</span></p>
-  <p>Total Expenses: $<span id="totalExpenses">0</span></p>
-  <p>Remaining Budget: $<span id="remainingBudget">0</span></p>
+    <div class="card">Total Income: $<span id="totalIncome">0</span></div>
+    <div class="card">Total Expenses: $<span id="totalExpenses">0</span></div>
+    <div class="card">Remaining Budget: $<span id="remainingBudget">0</span></div>
+    <div class="card">Total Goal Amount: $<span id="totalGoalAmount">0</span></div>
+    <div class="card">Total Saved: $<span id="totalSaved">0</span></div>
 
-  <p>Total Goal Amount: $<span id="totalGoalAmount">0</span></p>
-  <p>Total Saved: $<span id="totalSaved">0</span></p>
-</section>
+    <p id="budgetInsight"></p>
+  </section>
 
+  <!-- EXPENSES -->
   <section id="expenses" class="view hidden">
-    <h2>Expense Tracker</h2>
-    <input id="expenseName" placeholder="Expense Name">
+    <h2>Monthly Expenses</h2>
 
-    <input id="expenseAmount" type="number" placeholder="Amount">
+    <input id="expenseName" placeholder="Expense Name">
+    <input id="expenseAmount" type="number" placeholder="Monthly Expense Amount">
 
     <select id="expenseCategory">
       <option value="">Select Category</option>
@@ -45,20 +50,22 @@
     </select>
 
     <button id="addExpenseBtn">Add Expense</button>
+
     <ul id="expenseList"></ul>
   </section>
 
+  <!-- GOALS -->
   <section id="goals" class="view hidden">
-  <h2>Savings Goals</h2>
+    <h2>Savings Goals</h2>
 
-  <input id="goalName" placeholder="Goal Name">
-  <input id="goalAmount" type="number" placeholder="Goal Amount">
-  <input id="goalSaved" type="number" placeholder="Amount Saved">
+    <input id="goalName" placeholder="Goal Name">
+    <input id="goalAmount" type="number" placeholder="Goal Amount">
+    <input id="goalSaved" type="number" placeholder="Amount Saved">
 
-  <button id="addGoalBtn">Add Goal</button>
+    <button id="addGoalBtn">Add Goal</button>
 
-  <ul id="goalList"></ul>
-</section>
+    <ul id="goalList"></ul>
+  </section>
 
   <script src="script.js"></script>
 </body>

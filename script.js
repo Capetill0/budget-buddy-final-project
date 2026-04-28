@@ -1,189 +1,143 @@
 function showSection(sectionId) {
-  document.querySelectorAll(".view").forEach(section => {
-    section.classList.add("hidden");
-  });
-
+  document.querySelectorAll(".view").forEach(s => s.classList.add("hidden"));
   document.getElementById(sectionId).classList.remove("hidden");
 }
 
 function loadArray(key) {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (e) {
+    return raw ? JSON.parse(raw) : [];
+  } catch {
     return [];
   }
 }
 
-let expenses = loadArray("expenses").map(e => ({
-  name: e.name || "",
-  amount: Number(e.amount) || 0,
-  category: e.category || ""
-}));
+let expenses = loadArray("expenses");
+let goals = loadArray("goals");
+
+let income = (() => {
+  const raw = localStorage.getItem("income");
+  return raw ? Number(raw) : 0;
+})();
 
 const expenseList = document.getElementById("expenseList");
-const addExpenseBtn = document.getElementById("addExpenseBtn");
 
-addExpenseBtn.addEventListener("click", () => {
+document.getElementById("addExpenseBtn").addEventListener("click", () => {
   const name = document.getElementById("expenseName").value;
   const amount = Number(document.getElementById("expenseAmount").value);
   const category = document.getElementById("expenseCategory").value;
 
-  if (!name || !amount || !category) {
-    alert("Please fill out all expense fields.");
-    return;
-  }
+  if (!name || !amount || !category) return alert("Fill all fields");
 
   expenses.push({ name, amount, category });
-
   localStorage.setItem("expenses", JSON.stringify(expenses));
 
   renderExpenses();
-
-  document.getElementById("expenseName").value = "";
-  document.getElementById("expenseAmount").value = "";
-  document.getElementById("expenseCategory").value = "";
 });
 
 function renderExpenses() {
   expenseList.innerHTML = "";
 
-  let total = 0;
-
-  expenses.forEach((expense, index) => {
-    total += expense.amount;
-
+  expenses.forEach((e, i) => {
     expenseList.innerHTML += `
-  <li>
-    <strong>${expense.name}</strong><br>
-    Category: ${expense.category}<br>
-    Amount: $${expense.amount.toFixed(2)}
-    <button onclick="deleteExpense(${index})">Delete</button>
-  </li>
-`;
+      <li>
+        <strong>${e.name}</strong><br>
+        Category: ${e.category}<br>
+        Monthly Expense: $${e.amount.toFixed(2)}
+        <button onclick="deleteExpense(${i})">Delete</button>
+      </li>
+    `;
   });
 
-  document.getElementById("totalExpenses").textContent = total.toFixed(2);
   updateDashboard();
 }
 
-function deleteExpense(index) {
-  expenses.splice(index, 1);
-
+function deleteExpense(i) {
+  expenses.splice(i, 1);
   localStorage.setItem("expenses", JSON.stringify(expenses));
-
   renderExpenses();
 }
 
 renderExpenses();
 
-let goals = loadArray("goals").map(g => ({
-  name: g.name || "",
-  amount: Number(g.amount) || 0,
-  saved: Number(g.saved) || 0
-}));
-
 const goalList = document.getElementById("goalList");
-const addGoalBtn = document.getElementById("addGoalBtn");
 
-addGoalBtn.addEventListener("click", () => {
+document.getElementById("addGoalBtn").addEventListener("click", () => {
   const name = document.getElementById("goalName").value;
   const amount = Number(document.getElementById("goalAmount").value);
   const saved = Number(document.getElementById("goalSaved").value);
 
-  if (!name || !amount || saved < 0) {
-    alert("Please enter valid goal information.");
-    return;
-  }
+  if (!name || !amount || saved < 0) return alert("Fix goal input");
 
   goals.push({ name, amount, saved });
-
   localStorage.setItem("goals", JSON.stringify(goals));
 
   renderGoals();
-
-  document.getElementById("goalName").value = "";
-  document.getElementById("goalAmount").value = "";
-  document.getElementById("goalSaved").value = "";
 });
 
 function renderGoals() {
   goalList.innerHTML = "";
 
-  goals.forEach((goal, index) => {
-    const percent = Math.min((goal.saved / goal.amount) * 100, 100);
+  const monthlySavings = income - expenses.reduce((s, e) => s + e.amount, 0);
+
+  goals.forEach((g, i) => {
+    const percent = Math.min((g.saved / g.amount) * 100, 100);
+
+    let months = monthlySavings > 0
+      ? Math.ceil((g.amount - g.saved) / monthlySavings)
+      : "∞";
 
     goalList.innerHTML += `
       <li>
-        <strong>${goal.name}</strong><br>
-        $${goal.saved.toFixed(2)} / $${goal.amount.toFixed(2)}
+        <strong>${g.name}</strong><br>
+        $${g.saved.toFixed(2)} / $${g.amount.toFixed(2)}
+
         <div class="progress-bar">
           <div class="progress-fill" style="width:${percent}%"></div>
         </div>
-        <button onclick="deleteGoal(${index})">Delete</button>
+
+        <p>Time to goal: ${months} months</p>
+        <button onclick="deleteGoal(${i})">Delete</button>
       </li>
     `;
   });
+
   updateDashboard();
 }
 
-function deleteGoal(index) {
-  goals.splice(index, 1);
-
+function deleteGoal(i) {
+  goals.splice(i, 1);
   localStorage.setItem("goals", JSON.stringify(goals));
-
   renderGoals();
 }
 
 renderGoals();
 
-// Initialize income from localStorage safely
-let income = (() => {
-  const raw = localStorage.getItem("income");
-  return raw !== null ? Number(raw) : 0;
-})();
-
 const incomeInput = document.getElementById("incomeInput");
-const saveIncomeBtn = document.getElementById("saveIncomeBtn");
 
-if (incomeInput) incomeInput.value = income;
-
-if (saveIncomeBtn) {
-  saveIncomeBtn.addEventListener("click", () => {
-    const parsed = Number(incomeInput.value);
-    if (Number.isNaN(parsed) || parsed < 0) {
-      alert("Please enter a valid income.");
-      return;
-    }
-
-    income = parsed;
-
-    localStorage.setItem("income", String(income));
-
-    updateDashboard();
-  });
-}
+document.getElementById("saveIncomeBtn").addEventListener("click", () => {
+  income = Number(incomeInput.value);
+  localStorage.setItem("income", income);
+  updateDashboard();
+});
 
 function updateDashboard() {
-  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+  const totalGoals = goals.reduce((s, g) => s + g.amount, 0);
+  const totalSaved = goals.reduce((s, g) => s + g.saved, 0);
+  const monthlySavings = income - totalExpenses;
 
-  const totalGoalAmount = goals.reduce((sum, goal) => sum + goal.amount, 0);
+  document.getElementById("totalIncome").textContent = income.toFixed(2);
+  document.getElementById("totalExpenses").textContent = totalExpenses.toFixed(2);
+  document.getElementById("remainingBudget").textContent = (income - totalExpenses).toFixed(2);
+  document.getElementById("totalGoalAmount").textContent = totalGoals.toFixed(2);
+  document.getElementById("totalSaved").textContent = totalSaved.toFixed(2);
 
-  const totalSaved = goals.reduce((sum, goal) => sum + goal.saved, 0);
-
-  const totalIncomeEl = document.getElementById("totalIncome");
-  const totalExpensesEl = document.getElementById("totalExpenses");
-  const remainingBudgetEl = document.getElementById("remainingBudget");
-  const totalGoalAmountEl = document.getElementById("totalGoalAmount");
-  const totalSavedEl = document.getElementById("totalSaved");
-
-  if (totalIncomeEl) totalIncomeEl.textContent = (Number(income) || 0).toFixed(2);
-  if (totalExpensesEl) totalExpensesEl.textContent = totalExpenses.toFixed(2);
-  if (remainingBudgetEl) remainingBudgetEl.textContent = (Number(income) - totalExpenses).toFixed(2);
-  if (totalGoalAmountEl) totalGoalAmountEl.textContent = totalGoalAmount.toFixed(2);
-  if (totalSavedEl) totalSavedEl.textContent = totalSaved.toFixed(2);
+  const insight = document.getElementById("budgetInsight");
+  insight.textContent =
+    monthlySavings >= 0
+      ? `You are saving $${monthlySavings.toFixed(2)} per month.`
+      : `You are overspending by $${Math.abs(monthlySavings).toFixed(2)} per month.`;
 }
 
 updateDashboard();
