@@ -15,11 +15,18 @@
   </nav>
 
   <section id="dashboard" class="view">
-    <h1>Budget Buddy Dashboard</h1>
-    <p>Total Income: $<span id="totalIncome">0</span></p>
-    <p>Total Expenses: $<span id="totalExpenses">0</span></p>
-    <p>Remaining Budget: $<span id="remainingBudget">0</span></p>
-  </section>
+  <h1>Budget Buddy Dashboard</h1>
+
+  <input id="incomeInput" type="number" placeholder="Enter Monthly Income">
+  <button id="saveIncomeBtn">Save Income</button>
+
+  <p>Total Income: $<span id="totalIncome">0</span></p>
+  <p>Total Expenses: $<span id="totalExpenses">0</span></p>
+  <p>Remaining Budget: $<span id="remainingBudget">0</span></p>
+
+  <p>Total Goal Amount: $<span id="totalGoalAmount">0</span></p>
+  <p>Total Saved: $<span id="totalSaved">0</span></p>
+</section>
 
   <section id="expenses" class="view hidden">
     <h2>Expense Tracker</h2>

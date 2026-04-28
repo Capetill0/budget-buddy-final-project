@@ -47,6 +47,7 @@ function renderExpenses() {
   });
 
   document.getElementById("totalExpenses").textContent = total.toFixed(2);
+  updateDashboard();
 }
 
 function deleteExpense(index) {
@@ -102,6 +103,7 @@ function renderGoals() {
       </li>
     `;
   });
+  updateDashboard();
 }
 
 function deleteGoal(index) {
@@ -113,3 +115,46 @@ function deleteGoal(index) {
 }
 
 renderGoals();
+
+let income = Number(localStorage.getItem("income")) || 0;
+
+const incomeInput = document.getElementById("incomeInput");
+const saveIncomeBtn = document.getElementById("saveIncomeBtn");
+
+incomeInput.value = income;
+
+saveIncomeBtn.addEventListener("click", () => {
+  income = Number(incomeInput.value);
+
+  if (income < 0) {
+    alert("Please enter a valid income.");
+    return;
+  }
+
+  localStorage.setItem("income", income);
+
+  updateDashboard();
+});
+
+function updateDashboard() {
+  const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+  const totalGoalAmount = goals.reduce((sum, goal) => sum + goal.amount, 0);
+
+  const totalSaved = goals.reduce((sum, goal) => sum + goal.saved, 0);
+
+  document.getElementById("totalIncome").textContent = income.toFixed(2);
+  document.getElementById("totalExpenses").textContent = totalExpenses.toFixed(2);
+  document.getElementById("remainingBudget").textContent =
+    (income - totalExpenses).toFixed(2);
+
+  document.getElementById("totalGoalAmount").textContent =
+    totalGoalAmount.toFixed(2);
+
+  document.getElementById("totalSaved").textContent =
+    totalSaved.toFixed(2);
+}
+
+updateDashboard();
+
+updateDashboard();
