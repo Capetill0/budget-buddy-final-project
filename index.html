@@ -6,20 +6,18 @@
   <title>Budget Buddy</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-  <!-- NAVIGATION -->
   <nav>
     <button onclick="showSection('dashboard')">Dashboard</button>
     <button onclick="showSection('expenses')">Monthly Expenses</button>
     <button onclick="showSection('goals')">Savings Goals</button>
   </nav>
 
-  <!-- DASHBOARD -->
   <section id="dashboard" class="view">
     <h1>Budget Buddy Dashboard</h1>
 
+    <label for="incomeInput">Monthly Income</label>
     <input id="incomeInput" type="number" placeholder="Enter Monthly Income">
     <button id="saveIncomeBtn">Save Income</button>
 
@@ -30,15 +28,24 @@
     <div class="card">Total Saved: $<span id="totalSaved">0</span></div>
 
     <p id="budgetInsight"></p>
+
+    <h2>Expense Breakdown</h2>
+    <canvas id="expenseChart"></canvas>
+
+    <h2>Savings Goal Progress</h2>
+    <canvas id="goalChart"></canvas>
   </section>
 
-  <!-- EXPENSES -->
   <section id="expenses" class="view hidden">
     <h2>Monthly Expenses</h2>
 
-    <input id="expenseName" placeholder="Expense Name">
-    <input id="expenseAmount" type="number" placeholder="Monthly Expense Amount">
+    <label for="expenseName">Expense Name</label>
+    <input id="expenseName" placeholder="e.g. Rent">
 
+    <label for="expenseAmount">Monthly Expense Amount</label>
+    <input id="expenseAmount" type="number" placeholder="e.g. 1200">
+
+    <label for="expenseCategory">Expense Category</label>
     <select id="expenseCategory">
       <option value="">Select Category</option>
       <option value="Food">Food</option>
@@ -54,19 +61,24 @@
     <ul id="expenseList"></ul>
   </section>
 
-  <!-- GOALS -->
   <section id="goals" class="view hidden">
     <h2>Savings Goals</h2>
 
-    <input id="goalName" placeholder="Goal Name">
-    <input id="goalAmount" type="number" placeholder="Goal Amount">
-    <input id="goalSaved" type="number" placeholder="Amount Saved">
+    <label for="goalName">Goal Name</label>
+    <input id="goalName" placeholder="e.g. Vacation Fund">
+
+    <label for="goalAmount">Target Goal Amount</label>
+    <input id="goalAmount" type="number">
+
+    <label for="goalSaved">Amount Already Saved</label>
+    <input id="goalSaved" type="number">
 
     <button id="addGoalBtn">Add Goal</button>
 
     <ul id="goalList"></ul>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -20,6 +20,9 @@ let income = (() => {
   return raw ? Number(raw) : 0;
 })();
 
+let expenseChart;
+let goalChart;
+
 const expenseList = document.getElementById("expenseList");
 
 document.getElementById("addExpenseBtn").addEventListener("click", () => {
@@ -114,12 +117,45 @@ function deleteGoal(i) {
 renderGoals();
 
 const incomeInput = document.getElementById("incomeInput");
+incomeInput.value = income;
 
 document.getElementById("saveIncomeBtn").addEventListener("click", () => {
   income = Number(incomeInput.value);
   localStorage.setItem("income", income);
   updateDashboard();
 });
+
+function renderCharts() {
+  const expenseTotals = {};
+
+  expenses.forEach(e => {
+    expenseTotals[e.category] = (expenseTotals[e.category] || 0) + e.amount;
+  });
+
+  if (expenseChart) expenseChart.destroy();
+  if (goalChart) goalChart.destroy();
+
+  expenseChart = new Chart(document.getElementById("expenseChart"), {
+    type: "pie",
+    data: {
+      labels: Object.keys(expenseTotals),
+      datasets: [{
+        data: Object.values(expenseTotals)
+      }]
+    }
+  });
+
+  goalChart = new Chart(document.getElementById("goalChart"), {
+    type: "bar",
+    data: {
+      labels: goals.map(g => g.name),
+      datasets: [{
+        label: "Saved",
+        data: goals.map(g => g.saved)
+      }]
+    }
+  });
+}
 
 function updateDashboard() {
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
@@ -133,11 +169,12 @@ function updateDashboard() {
   document.getElementById("totalGoalAmount").textContent = totalGoals.toFixed(2);
   document.getElementById("totalSaved").textContent = totalSaved.toFixed(2);
 
-  const insight = document.getElementById("budgetInsight");
-  insight.textContent =
+  document.getElementById("budgetInsight").textContent =
     monthlySavings >= 0
       ? `You are saving $${monthlySavings.toFixed(2)} per month.`
       : `You are overspending by $${Math.abs(monthlySavings).toFixed(2)} per month.`;
+
+  renderCharts();
 }
 
 updateDashboard();
