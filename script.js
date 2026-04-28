@@ -14,13 +14,14 @@ const addExpenseBtn = document.getElementById("addExpenseBtn");
 addExpenseBtn.addEventListener("click", () => {
   const name = document.getElementById("expenseName").value;
   const amount = Number(document.getElementById("expenseAmount").value);
+  const category = document.getElementById("expenseCategory").value;
 
-  if (!name || !amount) {
-    alert("Please enter both expense name and amount.");
+  if (!name || !amount || !category) {
+    alert("Please fill out all expense fields.");
     return;
   }
 
-  expenses.push({ name, amount });
+  expenses.push({ name, amount, category });
 
   localStorage.setItem("expenses", JSON.stringify(expenses));
 
@@ -28,6 +29,7 @@ addExpenseBtn.addEventListener("click", () => {
 
   document.getElementById("expenseName").value = "";
   document.getElementById("expenseAmount").value = "";
+  document.getElementById("expenseCategory").value = "";
 });
 
 function renderExpenses() {
@@ -39,11 +41,13 @@ function renderExpenses() {
     total += expense.amount;
 
     expenseList.innerHTML += `
-      <li>
-        ${expense.name}: $${expense.amount.toFixed(2)}
-        <button onclick="deleteExpense(${index})">Delete</button>
-      </li>
-    `;
+  <li>
+    <strong>${expense.name}</strong><br>
+    Category: ${expense.category}<br>
+    Amount: $${expense.amount.toFixed(2)}
+    <button onclick="deleteExpense(${index})">Delete</button>
+  </li>
+`;
   });
 
   document.getElementById("totalExpenses").textContent = total.toFixed(2);
