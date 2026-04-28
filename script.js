@@ -6,7 +6,22 @@ function showSection(sectionId) {
   document.getElementById(sectionId).classList.remove("hidden");
 }
 
-let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+function loadArray(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+let expenses = loadArray("expenses").map(e => ({
+  name: e.name || "",
+  amount: Number(e.amount) || 0,
+  category: e.category || ""
+}));
 
 const expenseList = document.getElementById("expenseList");
 const addExpenseBtn = document.getElementById("addExpenseBtn");
@@ -64,7 +79,11 @@ function deleteExpense(index) {
 
 renderExpenses();
 
-let goals = JSON.parse(localStorage.getItem("goals")) || [];
+let goals = loadArray("goals").map(g => ({
+  name: g.name || "",
+  amount: Number(g.amount) || 0,
+  saved: Number(g.saved) || 0
+}));
 
 const goalList = document.getElementById("goalList");
 const addGoalBtn = document.getElementById("addGoalBtn");
@@ -120,25 +139,32 @@ function deleteGoal(index) {
 
 renderGoals();
 
-let income = Number(localStorage.getItem("income")) || 0;
+// Initialize income from localStorage safely
+let income = (() => {
+  const raw = localStorage.getItem("income");
+  return raw !== null ? Number(raw) : 0;
+})();
 
 const incomeInput = document.getElementById("incomeInput");
 const saveIncomeBtn = document.getElementById("saveIncomeBtn");
 
-incomeInput.value = income;
+if (incomeInput) incomeInput.value = income;
 
-saveIncomeBtn.addEventListener("click", () => {
-  income = Number(incomeInput.value);
+if (saveIncomeBtn) {
+  saveIncomeBtn.addEventListener("click", () => {
+    const parsed = Number(incomeInput.value);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      alert("Please enter a valid income.");
+      return;
+    }
 
-  if (income < 0) {
-    alert("Please enter a valid income.");
-    return;
-  }
+    income = parsed;
 
-  localStorage.setItem("income", income);
+    localStorage.setItem("income", String(income));
 
-  updateDashboard();
-});
+    updateDashboard();
+  });
+}
 
 function updateDashboard() {
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -147,18 +173,17 @@ function updateDashboard() {
 
   const totalSaved = goals.reduce((sum, goal) => sum + goal.saved, 0);
 
-  document.getElementById("totalIncome").textContent = income.toFixed(2);
-  document.getElementById("totalExpenses").textContent = totalExpenses.toFixed(2);
-  document.getElementById("remainingBudget").textContent =
-    (income - totalExpenses).toFixed(2);
+  const totalIncomeEl = document.getElementById("totalIncome");
+  const totalExpensesEl = document.getElementById("totalExpenses");
+  const remainingBudgetEl = document.getElementById("remainingBudget");
+  const totalGoalAmountEl = document.getElementById("totalGoalAmount");
+  const totalSavedEl = document.getElementById("totalSaved");
 
-  document.getElementById("totalGoalAmount").textContent =
-    totalGoalAmount.toFixed(2);
-
-  document.getElementById("totalSaved").textContent =
-    totalSaved.toFixed(2);
+  if (totalIncomeEl) totalIncomeEl.textContent = (Number(income) || 0).toFixed(2);
+  if (totalExpensesEl) totalExpensesEl.textContent = totalExpenses.toFixed(2);
+  if (remainingBudgetEl) remainingBudgetEl.textContent = (Number(income) - totalExpenses).toFixed(2);
+  if (totalGoalAmountEl) totalGoalAmountEl.textContent = totalGoalAmount.toFixed(2);
+  if (totalSavedEl) totalSavedEl.textContent = totalSaved.toFixed(2);
 }
-
-updateDashboard();
 
 updateDashboard();
