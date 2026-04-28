@@ -23,6 +23,7 @@ let income = (() => {
 let expenseChart;
 let goalChart;
 
+/* EXPENSES */
 const expenseList = document.getElementById("expenseList");
 
 document.getElementById("addExpenseBtn").addEventListener("click", () => {
@@ -135,6 +136,7 @@ function renderCharts() {
   if (expenseChart) expenseChart.destroy();
   if (goalChart) goalChart.destroy();
 
+  /* EXPENSE PIE CHART */
   expenseChart = new Chart(document.getElementById("expenseChart"), {
     type: "pie",
     data: {
@@ -145,14 +147,28 @@ function renderCharts() {
     }
   });
 
+  /* GOAL PERCENT COMPLETE BAR CHART */
   goalChart = new Chart(document.getElementById("goalChart"), {
     type: "bar",
     data: {
       labels: goals.map(g => g.name),
       datasets: [{
-        label: "Saved",
-        data: goals.map(g => g.saved)
+        label: "% of Goal Completed",
+        data: goals.map(g =>
+          Math.min((g.saved / g.amount) * 100, 100)
+        )
       }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: value => value + "%"
+          }
+        }
+      }
     }
   });
 }
